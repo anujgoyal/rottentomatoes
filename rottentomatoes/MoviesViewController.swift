@@ -13,7 +13,9 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     @IBOutlet weak var tableView: UITableView!
     var movies: [NSDictionary] = []
     var mid: String = ""
-
+    var refreshControl:UIRefreshControl!
+    
+    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         // set navigation bar controller
@@ -52,18 +54,17 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         getData()
         
         //
-        var refreshControl:UIRefreshControl!
         refreshControl = UIRefreshControl()
         refreshControl.backgroundColor = UIColor.orangeColor()
         refreshControl.tintColor = UIColor.whiteColor()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to Refresh")
-        refreshControl.addTarget(self, action: "getData:", forControlEvents: UIControlEvents.ValueChanged)
+        refreshControl.addTarget(self, action: "getData", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
     
     }
     
     func getData() {
-        // Get data
+        NSLog("getData called")
         var apiKey = "689574fmabnjswrkutgjhvrx"
         var url = "http://api.rottentomatoes.com/api/public/v1.0/lists/movies/box_office.json?apikey="+apiKey+"&limit=20&country=us"
         var request = NSURLRequest(URL: NSURL(string: url))
@@ -77,6 +78,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
                     self.movies = object["movies"] as [NSDictionary]
                 }
                 self.tableView.reloadData()
+                self.refreshControl.endRefreshing()
             } else {
                 // network error
                 
@@ -136,7 +138,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
         var movie = movies[indexPath.row]
         self.mid = movie["id"] as String
-        NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row) mid: " + self.mid)
+//        NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row) mid: " + self.mid)
         return indexPath
     }
     
@@ -144,7 +146,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row)")
 //        var movie = movies[indexPath.row]
 //        self.mid = movie["id"] as String
-        println("[didSelectRowAtIndexPath] mid: " + self.mid)
+//        println("[didSelectRowAtIndexPath] mid: " + self.mid)
     }
     
     // MARK: - Navigation
