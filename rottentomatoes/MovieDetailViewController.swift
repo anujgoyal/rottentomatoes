@@ -18,6 +18,7 @@ class MovieDetailViewController: UIViewController {
     @IBOutlet weak var year: UILabel!
     @IBOutlet weak var synopsis: UILabel!
     @IBOutlet weak var scrollView: UIScrollView!
+    @IBOutlet weak var rotRating: UILabel!
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -35,7 +36,7 @@ class MovieDetailViewController: UIViewController {
         // http://developer.rottentomatoes.com/docs/read/Home
         var apiKey: String = "689574fmabnjswrkutgjhvrx"
         var url: String = "http://api.rottentomatoes.com/api/public/v1.0/movies/"+movieID!+".json?apikey="+apiKey
-        NSLog("url = \(url)")
+        //NSLog("url = \(url)")
         var request = NSURLRequest(URL: NSURL(string: url))
         
         // setup HUD; https://github.com/jdg/MBProgressHUD
@@ -62,10 +63,22 @@ class MovieDetailViewController: UIViewController {
             
             self.synopsis.text = object["synopsis"] as? String
             self.mpaaRating.text = object["mpaa_rating"] as? String
+            
+            // setup ratings
             var ratings = object["ratings"] as NSDictionary
-            var posters = object["posters"] as NSDictionary
+            NSLog("ratings: \(ratings)")
+            var audRating = ratings["audience_rating"] as? String
+            var audScore = ratings["audience_score"] as? Int
+            NSLog("audRating: \(audRating!)")
+            NSLog("audScore: \(audScore!)")
+            var criRating = ratings["critics_rating"] as? String
+            var criScore = ratings["critics_score"] as? Int
+            NSLog("audRating: \(criRating!)")
+            NSLog("audScore: \(criScore!)")
+            self.rotRating.text = "Audience: \(audScore!)%, Critics: \(criScore!)%"
             
             // setup background picture
+            var posters = object["posters"] as NSDictionary
             var posterUrl = posters["thumbnail"] as String
             var image = UIImageView()
             image.setImageWithURL(NSURL(string: posterUrl))

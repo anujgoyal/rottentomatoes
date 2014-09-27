@@ -33,19 +33,27 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     
     /*override func viewDidAppear(animated: Bool) {
     super.viewDidAppear(animated)
-    
-    var alert = UIAlertController(title: "test title",
-    message: "test message",
-    preferredStyle: .Alert)
-    let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
-    alert.addAction(cancelAction)
-    self.presentViewController(alert, animated: true, completion:nil)
-    // if some error
-    //let alert = UIAlertController(title: "Network Error", message: "No Connection", preferredStyle: .Alert)
-    //let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
-    //alert.addAction(cancelAction)
-    //self.navigationController.presentViewController(alert, animated: true, completion: nil)
+    showAlert()
     }*/
+    
+    // https://developer.apple.com/library/ios/documentation/UIKit/Reference/UITableViewDelegate_Protocol/index.html#//apple_ref/occ/intfm/UITableViewDelegate/tableView:shouldHighlightRowAtIndexPath:
+    func tableView(tableView: UITableView, shouldHighlightRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(tableView: UITableView, didHighlightRowAtIndexPath indexPath: NSIndexPath) {
+        var cell = tableView.cellForRowAtIndexPath(indexPath)
+        cell?.contentView.backgroundColor = UIColor.orangeColor()
+        cell?.backgroundColor = UIColor.orangeColor()
+    }
+
+    func tableView(tableView: UITableView, didUnHighlightRowAtIndexPath indexPath: NSIndexPath) {
+        var cell = tableView.cellForRowAtIndexPath(indexPath)
+        cell?.contentView.backgroundColor = UIColor.blackColor()
+        cell?.backgroundColor = UIColor.blackColor()
+    }
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -158,13 +166,18 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         // set selectionStyle
         cell.selectionStyle = UITableViewCellSelectionStyle.Blue
         
+        // http://stackoverflow.com/questions/1998775/uitableview-cell-selected-color
+        var bgColorView = UIView()
+        bgColorView.backgroundColor = UIColor.orangeColor()
+        cell.selectedBackgroundView = bgColorView
+        
         return cell
     }
 
     func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
         var movie = movies[indexPath.row]
         self.mid = movie["id"] as String
-//        NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row) mid: " + self.mid)
+        //NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row) mid: " + self.mid)
         return indexPath
     }
     
@@ -183,7 +196,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         if segue.identifier == "MovieDetailSegue" {
             let vc = segue.destinationViewController as MovieDetailViewController
             vc.movieID = self.mid
-            NSLog("["+__FUNCTION__+"] mid: " + self.mid)
+            //NSLog("["+__FUNCTION__+"] mid: " + self.mid)
         }
     }
     
