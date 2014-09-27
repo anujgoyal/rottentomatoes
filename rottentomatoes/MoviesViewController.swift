@@ -50,17 +50,17 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
         }))
         self.presentViewController(alert, animated: true, completion: nil)*/
         
-        // get data from network
-        getData()
-        
-        //
+        // setup refresh control
         refreshControl = UIRefreshControl()
         refreshControl.backgroundColor = UIColor.orangeColor()
         refreshControl.tintColor = UIColor.whiteColor()
         refreshControl.attributedTitle = NSAttributedString(string: "Pull to Refresh")
         refreshControl.addTarget(self, action: "getData", forControlEvents: UIControlEvents.ValueChanged)
         tableView.addSubview(refreshControl)
-    
+
+        // get data from network, has to come after refreshControl is setup
+        getData()
+
     }
     
     func getData() {
@@ -143,7 +143,7 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     }
     
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-        NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row)")
+//        NSLog("["+__FUNCTION__ + "] cell #\(indexPath.row)")
 //        var movie = movies[indexPath.row]
 //        self.mid = movie["id"] as String
 //        println("[didSelectRowAtIndexPath] mid: " + self.mid)

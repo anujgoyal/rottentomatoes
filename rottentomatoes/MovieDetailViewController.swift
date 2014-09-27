@@ -9,18 +9,15 @@
 import UIKit
 
 class MovieDetailViewController: UIViewController {
-
+    // movieID gets filled from parent controller
     var movieID: String? = ""
-    //var movieTitle: String!
-    //var mpaa_rating: String!
-    //var synopsis: String!
     var runtime: Int!
-    //var year: Int!
     
     @IBOutlet weak var movieTitle: UILabel!
     @IBOutlet weak var mpaaRating: UILabel!
     @IBOutlet weak var year: UILabel!
     @IBOutlet weak var synopsis: UILabel!
+    @IBOutlet weak var scrollView: UIScrollView!
     
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
@@ -31,39 +28,72 @@ class MovieDetailViewController: UIViewController {
     }
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
+        super.viewDidLoad() // Do any additional setup after loading the view.
+
+        // get movie from rotten tomatoes movies API
+        // http://developer.rottentomatoes.com/docs/read/Home
         var apiKey: String = "689574fmabnjswrkutgjhvrx"
         var url: String = "http://api.rottentomatoes.com/api/public/v1.0/movies/"+movieID!+".json?apikey="+apiKey
         NSLog("url = \(url)")
-        //http://developer.rottentomatoes.com/docs/read/Home
         var request = NSURLRequest(URL: NSURL(string: url))
+        
+        // setup HUD; https://github.com/jdg/MBProgressHUD
+        //var hud = MBProgressHUD()
+        //hud.show(true)
+        var hud = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
+        hud.mode = MBProgressHUDModeDeterminate
+        hud.labelText = "Loading...";
+        
         NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue() ) {
             (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
 
             var err: NSError?
             var object = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &err) as NSDictionary
-            NSLog("object = \(object)")
-//            self.year.text = (object["year"] as? Int)._bridgeToObjectiveC(NSString )
-//            self.runtime = object["runtime"] as? Int
-            self.movieTitle.text = object["title"] as? String
-            self.title = self.movieTitle.text
+            //NSLog("object = \(object)")
+            
+            // if some error
+            let alert = UIAlertController(title: "Network Error", message: "No Connection", preferredStyle: .Alert)
+            let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
+            alert.addAction(cancelAction)
+            //self.navigationController.presentViewController(alert, animated: true, completion: nil)
+            
+            if let yearInt = object["year"] as? Int {
+                self.year.text = String(yearInt)
+            }
+            //if let runtimeInt = object["runtime"] as? Int {
+            //    self.runtime.text = String(runtimeInt)
+            //}
+            
+            self.title = object["title"] as? String
+            self.movieTitle.text = self.title
             
             self.synopsis.text = object["synopsis"] as? String
             self.mpaaRating.text = object["mpaa_rating"] as? String
-            NSLog("year: \(self.year)")
+            /*NSLog("year: \(self.year)")
             NSLog("runtime: \(self.runtime)")
             NSLog("title: \(self.movieTitle)")
             NSLog("synopsis: \(self.synopsis)")
             NSLog("mpaaRating: \(self.mpaaRating)")
+            var genres = object["genres"] as? String
+            NSLog("genres: \(genres)")*/
+            var ratings = object["ratings"] as NSDictionary
+            var posters = object["posters"] as NSDictionary
+            //NSLog("ratings: \(ratings)")
+            //NSLog("posters: \(posters)")
+
+            // setup background picture
+            var posterUrl = posters["thumbnail"] as String
+            var image = UIImageView()
+            image.setImageWithURL(NSURL(string: posterUrl))
+            image.contentMode = UIViewContentMode.ScaleAspectFill
+            // http://stackoverflow.com/questions/24109114
+            // http://stackoverflow.com/questions/185652/how-to-scale-a-uiimageview-proportionally?rq=1 (good)
+            self.scrollView.backgroundColor = UIColor.clearColor()
+            self.scrollView.addSubview(image)
+            //self.scrollView!.alpha = 1
             
-            //var genres = object["genres"] as? String
-            //NSLog("genres: \(genres)")
-            var ratings = object["ratings"] as? NSDictionary
-            var posters = object["posters"] as? NSDictionary
-            NSLog("ratings: \(ratings)")
-            NSLog("posters: \(posters)")
+            // stop the hud
+            MBProgressHUD.hideHUDForView(self.view, animated: true)
         }
 
     }
