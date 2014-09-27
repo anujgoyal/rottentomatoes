@@ -15,17 +15,37 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
     var mid: String = ""
     var refreshControl:UIRefreshControl!
     
-    
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        // set navigation bar controller
         // http://stackoverflow.com/questions/24687238/changing-navigation-bar-colour-in-swift
-        //self.navigationController?.navigationBar.barTintColor = UIColor.blackColor()
-        //self.tabBarController?.tabBar.tintColor = UIColor.yellowColor()
-        self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
-        self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
-        self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.orangeColor()]
+        var nav = self.navigationController?.navigationBar
+        nav?.barStyle = UIBarStyle.Black
+        nav?.tintColor = UIColor.whiteColor()
+        nav?.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.orangeColor()]
     }
+    
+    func showAlert() {
+        var alert = UIAlertController(title: "Network Error", message: "No Connection", preferredStyle: .Alert)
+        let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
+        alert.addAction(cancelAction)
+        self.presentViewController(alert, animated: true, completion:nil)
+    }
+    
+    /*override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    
+    var alert = UIAlertController(title: "test title",
+    message: "test message",
+    preferredStyle: .Alert)
+    let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
+    alert.addAction(cancelAction)
+    self.presentViewController(alert, animated: true, completion:nil)
+    // if some error
+    //let alert = UIAlertController(title: "Network Error", message: "No Connection", preferredStyle: .Alert)
+    //let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
+    //alert.addAction(cancelAction)
+    //self.navigationController.presentViewController(alert, animated: true, completion: nil)
+    }*/
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -75,7 +95,13 @@ class MoviesViewController: UIViewController, UITableViewDelegate, UITableViewDa
             if urlData != nil {
                 var err: NSError?
                 if let object = (NSJSONSerialization.JSONObjectWithData(urlData, options: nil, error: &err) as? NSDictionary) {
+                    NSLog("object valid")
+                    // data was returned, populate dictionary
                     self.movies = object["movies"] as [NSDictionary]
+                } else {
+                    NSLog("object NOT valid")
+                    // there was an error
+                    self.showAlert()
                 }
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()
