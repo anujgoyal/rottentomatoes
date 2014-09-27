@@ -25,6 +25,7 @@ class MovieDetailViewController: UIViewController {
         self.navigationController?.navigationBar.barStyle = UIBarStyle.Black
         self.navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         self.navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.orangeColor()]
+        //self.navigationController?.navigationBar.translucent = false
     }
     
     override func viewDidLoad() {
@@ -38,10 +39,8 @@ class MovieDetailViewController: UIViewController {
         var request = NSURLRequest(URL: NSURL(string: url))
         
         // setup HUD; https://github.com/jdg/MBProgressHUD
-        //var hud = MBProgressHUD()
-        //hud.show(true)
         var hud = MBProgressHUD.showHUDAddedTo(self.view, animated: true)
-        hud.mode = MBProgressHUDModeDeterminate
+        hud.mode = MBProgressHUDModeIndeterminate
         hud.labelText = "Loading...";
         
         NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue() ) {
@@ -50,12 +49,6 @@ class MovieDetailViewController: UIViewController {
             var err: NSError?
             var object = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &err) as NSDictionary
             //NSLog("object = \(object)")
-            
-            // if some error
-            let alert = UIAlertController(title: "Network Error", message: "No Connection", preferredStyle: .Alert)
-            let cancelAction = UIAlertAction(title: "OK", style: .Cancel, handler: nil)
-            alert.addAction(cancelAction)
-            //self.navigationController.presentViewController(alert, animated: true, completion: nil)
             
             if let yearInt = object["year"] as? Int {
                 self.year.text = String(yearInt)
@@ -69,18 +62,9 @@ class MovieDetailViewController: UIViewController {
             
             self.synopsis.text = object["synopsis"] as? String
             self.mpaaRating.text = object["mpaa_rating"] as? String
-            /*NSLog("year: \(self.year)")
-            NSLog("runtime: \(self.runtime)")
-            NSLog("title: \(self.movieTitle)")
-            NSLog("synopsis: \(self.synopsis)")
-            NSLog("mpaaRating: \(self.mpaaRating)")
-            var genres = object["genres"] as? String
-            NSLog("genres: \(genres)")*/
             var ratings = object["ratings"] as NSDictionary
             var posters = object["posters"] as NSDictionary
-            //NSLog("ratings: \(ratings)")
-            //NSLog("posters: \(posters)")
-
+            
             // setup background picture
             var posterUrl = posters["thumbnail"] as String
             var image = UIImageView()
@@ -90,7 +74,8 @@ class MovieDetailViewController: UIViewController {
             // http://stackoverflow.com/questions/185652/how-to-scale-a-uiimageview-proportionally?rq=1 (good)
             self.scrollView.backgroundColor = UIColor.clearColor()
             self.scrollView.addSubview(image)
-            //self.scrollView!.alpha = 1
+            self.scrollView.scrollEnabled = true
+            //self.scrollView.alpha = 1
             
             // stop the hud
             MBProgressHUD.hideHUDForView(self.view, animated: true)
